@@ -2,6 +2,8 @@ package networkmanager
 
 import (
 	"fmt"
+	"encoding/binary"
+	"net"
 
 	"github.com/godbus/dbus"
 )
@@ -111,6 +113,13 @@ type ConnectionSetting struct {
 	IsOpenWifi	bool
 }
 
+func uint32ToIp(ipInt uint32) (string) {
+     var ipByte [4]byte
+     ip := ipByte[:]
+     binary.LittleEndian.PutUint32(ip, ipInt)
+     return net.IPv4(ip[0], ip[1], ip[2], ip[3]).String()
+}
+
 func GetActiveConnections() ([]dbus.ObjectPath, error) {
 	conn, err := dbus.SystemBus()
 	if err != nil {
@@ -180,3 +189,21 @@ func GetOpenWifiConnections(activeConnections []dbus.ObjectPath) ([]ConnectionSe
 	return openWifiConnections
 }
 
+func GetDhcpNameservers(activeConnection dbus.ObjectPath) ([]string, error) {
+	var nameservers []string
+	conn, err := dbus.SystemBus()
+	if err != nil {
+		return nameservers, err
+	}
+	obj := conn.Object("org.freedesktop.NetworkManager", activeConnection)
+	configProps, err := obj.GetProperty("org.freedesktop.NetworkManager.Connection.Active.Ip4Config")
+	if err != nil {
+		return nameservers, err
+	}
+	obj2 := conn.Object("org.freedesktop.NetworkManager", configProps.Value().(dbus.ObjectPath))
+	nsProps, err := obj2.GetProperty("org.freedesktop.NetworkManager.IP4Config.Nameservers")
+	for _, ns := range nsProps.Value().([]uint32) {
+		nameservers = append(nameservers, uint32ToIp(ns))
+	}
+	return nameservers, nil
+}

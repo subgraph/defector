@@ -60,20 +60,6 @@ func HandleDeviceStateChange(state uint32) () {
 	}
 }
 
-/*func IsTorConnected() (bool) {
-	connection, err := tc.Connect("tcp", "127.0.0.1:9051")
-	if err != nil {
-		panic(err)
-	}
-	defer connection.Close()
-	response, err := tc.SendCommand(connection, tc.Authenticate(""))
-        if err != nil {
-                panic(err)
-        }
-        fmt.Printf(response)
-        return tc.IsTorConnected(connection)
-}*/
-
 func detectCaptivePortalNotification() (bool) {
 	hints := make(map[string]interface{})
 	hints["notify.Persistence"] = true

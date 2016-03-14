@@ -1,16 +1,27 @@
 package main
 
 import (
+	"bufio"
 	"time"
+	"flag"
 	"fmt"
+	"os"
 	"os/exec"
+	"strings"
 	"bytes"
-
+	
 	nm "github.com/subgraph/defector/networkmanager"
 	tc "github.com/subgraph/defector/torcontrol"
 	"github.com/godbus/dbus"
 	"github.com/TheCreeper/go-notify"
 )
+
+var timeoutVar int
+
+func init() {
+	flag.IntVar(&timeoutVar, "t", 10, 
+		"Timeout (in seconds) for captive portal detection prompt")
+}
 
 func MonitorDeviceStateChanged() {
 	conn, err := dbus.SystemBus()
@@ -30,7 +41,7 @@ func MonitorDeviceStateChanged() {
 func HandleDeviceStateChange(state uint32) () {
 	cmd := exec.Command("./captivebrowser/captivebrowser", "-d")
 	if state == nm.NM_DEVICE_STATE_IP_CONFIG {
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Duration(timeoutVar) * time.Second)
 		connections, err := nm.GetActiveConnections()
 		if err != nil {
 			panic(err)
@@ -123,5 +134,6 @@ func HandleNotificationAction(id uint32) (bool) {
 }
 
 func main() {
+	flag.Parse()
 	MonitorDeviceStateChanged()
 }

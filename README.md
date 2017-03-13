@@ -25,4 +25,9 @@ the browser)
 the captive portal network and re-using that spoofed MAC on subsequent 
 connections to the network -- if the user chooses to do so)
 
+*NOTE*: This project was experimental and is no longer maintained. defector
+is not included in Subgraph OS. The preferred method of captive portal
+authentication in Subgraph OS is using our clearnet sandboxed Chromium browser
+configuration. For more information, see:
+[https://subgraph.com/sgos/documentation/clearnet-chromium/](https://subgraph.com/sgos/documentation/clearnet-chromium/)
 
